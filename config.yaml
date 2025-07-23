@@ -1,0 +1,88 @@
+# Cleanbook Configuration
+# Strategic parameters for digital entropy management and cognitive optimization
+
+# Core Behavioral Settings
+safe_mode: true                    # Restrict deletions to explicitly matched patterns
+aggressive_mode: false             # Include system caches and deeper OS artifacts
+interactive_mode: false            # Prompt before each deletion
+dry_run_default: true             # Default to simulation mode for safety
+
+# Cognitive Load Thresholds
+size_thresholds:
+  minimum_file_size: "1MB"         # Don't delete files smaller than this
+  minimum_folder_size: "50MB"      # Focus on directories with significant storage impact
+  aggressive_threshold: "500MB"    # Target large accumulations for priority cleanup
+  critical_threshold: "5GB"        # Flag extremely large artifacts for manual review
+
+# Strategic Whitelist - Protected Cognitive Territories
+whitelist_paths:
+  - /Users/geeknik/dev/cleanbook     # Never delete ourselves (recursive protection)
+  - /Users/geeknik/Documents         # User documents are sacred
+  - /Users/geeknik/Desktop           # Desktop workspace preservation
+  - /Users/geeknik/.ssh              # Security credentials must persist
+  - /Users/geeknik/.aws              # Cloud configuration persistence
+  - /Users/geeknik/.config           # Core user configuration states
+  - /System                          # System integrity maintenance
+  - /Library                         # System libraries are untouchable
+  - /Applications                    # Installed applications protection
+  - /Users/geeknik/dev/active        # Current development projects
+
+# System Exclusions - Critical Infrastructure
+critical_system_paths:
+  - /bin
+  - /sbin
+  - /usr/bin
+  - /usr/sbin
+  - /var/log
+  - /etc
+  - /opt
+  - /Library/LaunchDaemons
+  - /Library/LaunchAgents
+
+# Audit and Transparency Infrastructure
+logging:
+  enabled: true
+  log_path: "~/cleanbook.log"
+  log_level: "INFO"                # DEBUG, INFO, WARNING, ERROR
+  max_log_size: "100MB"
+  log_rotation: true
+  include_timestamps: true
+  include_file_sizes: true
+
+# Behavioral Patterns
+deletion_behavior:
+  confirm_before_delete: true       # Require explicit confirmation
+  skip_hidden_files: false         # Include dotfiles in analysis
+  follow_symlinks: false           # Don't traverse symbolic links
+  max_depth: 10                    # Limit recursion depth for safety
+  batch_size: 100                  # Process files in batches for performance
+
+# Temporal Scheduling Architecture
+scheduling:
+  enabled: false                   # Disabled by default - user must opt-in
+  frequency: "weekly"              # weekly, daily, monthly
+  day_of_week: 1                   # Monday = 1, Sunday = 7
+  hour: 3                          # 3 AM for minimal disruption
+  minute: 30
+  auto_update_patterns: false      # Whether to update patterns automatically
+
+# Advanced Cognitive Optimization
+advanced:
+  machine_learning_prioritization: false  # Future feature: ML-based deletion priority
+  access_frequency_analysis: false        # Track file access patterns
+  user_behavior_adaptation: false         # Adapt cleanup patterns to user behavior
+  semantic_file_analysis: false           # Analyze file content for relevance
+
+# Performance Optimization
+performance:
+  parallel_processing: true        # Use multiple threads for analysis
+  max_workers: 4                   # Number of worker threads
+  memory_limit: "1GB"              # Maximum memory usage
+  progress_reporting: true         # Show progress during operations
+
+# Integration Interfaces
+integrations:
+  finder_services: false           # macOS Finder integration
+  terminal_completion: true        # Bash/Zsh completion scripts
+  menu_bar_widget: false          # Status bar monitoring widget
+  notification_center: true       # System notifications for cleanup events

@@ -1,0 +1,112 @@
+# Cleanbook Deletion Patterns
+# Canonical patterns for identifying development artifacts and digital detritus
+
+python:
+  directories:
+    - .venv
+    - env
+    - .env
+    - .tox
+    - .pytest_cache
+    - __pycache__
+    - .coverage
+    - "*.egg-info"
+    - .mypy_cache
+    - .ruff_cache
+  files:
+    - "*.pyc"
+    - "*.pyo"
+    - "*.pyd"
+    - .coverage
+    - coverage.xml
+
+javascript:
+  directories:
+    - node_modules
+    - .next
+    - .nuxt
+    - dist
+    - build
+    - .parcel-cache
+    - .turbo
+    - .svelte-kit
+    - .nyc_output
+    - .webpack
+    - .vite
+    - .rollup.cache
+  files:
+    - "*.log"
+    - npm-debug.log*
+    - yarn-debug.log*
+    - yarn-error.log*
+    - .eslintcache
+
+rust:
+  directories:
+    - target
+    - .cargo/registry
+  files:
+    - Cargo.lock
+
+go:
+  directories:
+    - vendor
+    - .gocache
+  files:
+    - go.sum
+
+general:
+  directories:
+    - .cache
+    - .tmp
+    - .temp
+    - .Trash
+    - .DS_Store
+    - .git/objects/pack
+  files:
+    - .DS_Store
+    - Thumbs.db
+    - "*.tmp"
+    - "*.temp"
+    - "*.log"
+    - "*.swp"
+    - "*.swo"
+    - "*~"
+
+ci_build:
+  directories:
+    - .github/workflows/cache
+    - .circleci/cache
+    - .jenkins/cache
+    - .gitlab-ci/cache
+  files:
+    - junit.xml
+    - coverage.xml
+
+system_cache:
+  directories:
+    - ~/Library/Caches/pip
+    - ~/Library/Caches/npm
+    - ~/Library/Caches/yarn
+    - ~/Library/Caches/Homebrew
+    - ~/Library/Caches/com.apple.dt.Xcode
+    - ~/Library/Developer/Xcode/DerivedData
+    - ~/Library/Logs/DiagnosticReports
+  files:
+    - "*.crash"
+    - "*.diag"
+
+# Aggressive mode targets (use with caution)
+aggressive:
+  directories:
+    - ~/.npm/_cacache
+    - ~/.cargo/registry
+    - ~/.cache/pip
+    - ~/.gradle/caches
+    - ~/.m2/repository
+    - ~/Library/Application Support/Code/logs
+    - ~/Library/Application Support/Code/CachedData
+  files:
+    - "*.dSYM"
+    - "*.ipa"
+    - "*.app"
