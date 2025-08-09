@@ -66,7 +66,13 @@ cleanbook_security_report.json
 *_exploit_*
 *_vulnerability_*
 *_fuzzing_*
-*_security_*
+# Audit Reports
+SECURITY_AUDIT_REPORT.json
+SECURITY_AUDIT_SUMMARY.md
+SECURITY_TEST_SUITE_SUMMARY.md
+audit_reports/
+security_audits/
+penetration_tests/
 
 # Other
 CLAUDE.md
