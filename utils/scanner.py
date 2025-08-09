@@ -208,35 +208,29 @@ class FilesystemScanner:
         self.discovered_artifacts.clear()
         self.scan_errors.clear()
         
+        # Track seen inodes to prevent duplicates
+        seen_inodes = set()
+        
         # Parallel scanning for enhanced perception
         with ThreadPoolExecutor(max_workers=self.parallel_workers) as executor:
             # Submit scanning tasks
             futures = []
             
-            # Start with immediate subdirectories for better parallelization
-            try:
-                for entry in os.scandir(target_path):
-                    if entry.is_dir() and not self._is_whitelisted(Path(entry.path)):
-                        future = executor.submit(
-                            list, 
-                            self._scan_directory(Path(entry.path), depth=1)
-                        )
-                        futures.append(future)
-            except (PermissionError, OSError) as e:
-                self.scan_errors.append((target_path, e))
-            
-            # Also scan the root directory itself
-            futures.append(executor.submit(
+            # Scan the root directory for direct artifacts only (non-recursive)
+            future = executor.submit(
                 list,
                 self._scan_directory(target_path, depth=0)
-            ))
+            )
+            futures.append(future)
             
             # Harvest results from parallel dimensions
             for future in as_completed(futures):
                 try:
                     artifacts = future.result()
                     for artifact in artifacts:
-                        if artifact.size_mb >= min_size_mb:
+                        # Deduplicate by inode to prevent same artifact appearing multiple times
+                        if artifact.inode not in seen_inodes and artifact.size_mb >= min_size_mb:
+                            seen_inodes.add(artifact.inode)
                             self.discovered_artifacts.append(artifact)
                 except Exception as e:
                     self.scan_errors.append((target_path, e))
