@@ -72,6 +72,7 @@ class DigitalNuker:
             "/System",
             "/Library",
             "/Applications",
+            "/etc",
             "/usr",
             "/bin",
             "/sbin",
@@ -118,6 +119,23 @@ class DigitalNuker:
                     "safety_check"
                 )
                 return False
+            
+            # Path traversal protection
+            home_path = Path.home().resolve()
+            if not resolved_path.is_relative_to(home_path):
+                self.logger.log_error(
+                    Exception(f"Path outside user home: {path}"),
+                    "safety_check"
+                )
+                return False
+                
+            # Block parent directory traversal patterns
+            if ".." in str(path) or ".." in resolved_path.parts:
+                self.logger.log_error(
+                    Exception(f"Path traversal attempt detected: {path}"),
+                    "safety_check"
+                )
+                return False
                 
             return True
             
@@ -136,9 +154,12 @@ class DigitalNuker:
         start_time = time.time()
         
         try:
+            # Atomic stat operation to prevent TOCTOU
+            initial_stat = path.stat()
+            
             # Calculate size before deletion
             if path.is_file():
-                size_bytes = path.stat().st_size
+                size_bytes = initial_stat.st_size
             else:
                 size_bytes = sum(
                     f.stat().st_size 
@@ -150,7 +171,12 @@ class DigitalNuker:
             
             # Perform the destruction ritual
             if not dry_run:
+                # Re-verify file hasn't changed before deletion
+                current_stat = path.stat()
                 if path.is_file():
+                    if (current_stat.st_size != initial_stat.st_size or 
+                        current_stat.st_mtime != initial_stat.st_mtime):
+                        raise Exception("File modified during deletion process")
                     path.unlink()
                 else:
                     shutil.rmtree(path, ignore_errors=False)

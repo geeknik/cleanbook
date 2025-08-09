@@ -38,21 +38,66 @@ def load_config(config_path: Path) -> dict:
         sys.exit(1)
 
 
-def parse_size_threshold(threshold_str: str) -> float:
+def parse_size_threshold(threshold_str) -> float:
     """Parse size threshold string (e.g., '100MB', '1GB') to MB"""
-    if not threshold_str:
+    if threshold_str is None:
         return 0.0
     
-    threshold_str = threshold_str.upper()
-    if threshold_str.endswith('MB'):
-        return float(threshold_str[:-2])
-    elif threshold_str.endswith('GB'):
-        return float(threshold_str[:-2]) * 1024
-    elif threshold_str.endswith('KB'):
-        return float(threshold_str[:-2]) / 1024
+    # Input validation and sanitization
+    if not isinstance(threshold_str, str):
+        raise ValueError("Threshold must be a string")
+    
+    if not threshold_str.strip():
+        raise ValueError("Invalid threshold format")
+    
+    # Check for negative values before sanitization
+    if '-' in threshold_str:
+        raise ValueError(f"Negative threshold not allowed: {threshold_str}")
+        
+    # Remove any non-alphanumeric characters except decimal points, but preserve B for bytes
+    import re
+    sanitized = re.sub(r'[^0-9.KMGTB]', '', threshold_str.upper())
+    
+    if not sanitized:
+        raise ValueError("Invalid threshold format")
+    
+    # Extract numeric value and unit
+    if sanitized.endswith('MB'):
+        value_str = sanitized[:-2]
+        unit = 'MB'
+    elif sanitized.endswith('GB'):
+        value_str = sanitized[:-2]
+        unit = 'GB'
+    elif sanitized.endswith('TB'):
+        value_str = sanitized[:-2]
+        unit = 'TB'
+    elif sanitized.endswith('KB'):
+        value_str = sanitized[:-2]
+        unit = 'KB'
     else:
         # Assume MB if no unit specified
-        return float(threshold_str)
+        value_str = sanitized
+        unit = 'MB'
+        
+    try:
+        value = float(value_str)
+    except ValueError:
+        raise ValueError(f"Invalid numeric value in threshold: {value_str}")
+    
+    # Validate reasonable bounds
+    if value < 0:
+        raise ValueError(f"Negative threshold not allowed: {threshold_str}")
+    if value > 1048576:  # Max 1TB in MB
+        raise ValueError(f"Threshold too large (max 1TB): {value}")
+    
+    if unit == 'GB':
+        return value * 1024
+    elif unit == 'TB':
+        return value * 1024 * 1024
+    elif unit == 'KB':
+        return value / 1024
+    else:
+        return value
 
 
 def main():

@@ -8,6 +8,7 @@ import sys
 import time
 import datetime
 import subprocess
+import tempfile
 from pathlib import Path
 from typing import Optional, Dict, Any, List
 import yaml
@@ -117,6 +118,14 @@ class Scheduler:
         """Generate launchd plist content for system scheduling"""
         script_path = Path(__file__).parent.parent / "cleanbook.py"
         
+        # Ensure secure log directory exists
+        log_dir = Path.home() / "Library/Logs"
+        log_dir.mkdir(mode=0o750, exist_ok=True)
+        
+        # Create secure log paths
+        stdout_log = log_dir / "cleanbook.log"
+        stderr_log = log_dir / "cleanbook.error.log"
+        
         if frequency == 'daily':
             interval = 86400  # 24 hours in seconds
         elif frequency == 'weekly':
@@ -149,9 +158,9 @@ class Scheduler:
         <integer>{minute}</integer>
     </dict>
     <key>StandardOutPath</key>
-    <string>/tmp/cleanbook.log</string>
+    <string>{stdout_log}</string>
     <key>StandardErrorPath</key>
-    <string>/tmp/cleanbook.error.log</string>
+    <string>{stderr_log}</string>
     <key>RunAtLoad</key>
     <false/>
 </dict>

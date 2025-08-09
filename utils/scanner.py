@@ -56,7 +56,13 @@ class FilesystemScanner:
             parallel_workers: Cognitive parallelization factor
         """
         self.patterns = self._load_patterns(patterns_path)
-        self.whitelist = [Path(p).expanduser().resolve() for p in whitelist]
+        # Add critical system paths to whitelist for protection
+        system_protected = [
+            "/System", "/Library", "/Applications", "/etc",
+            "/usr", "/bin", "/sbin", "/private", "/dev", "/Volumes"
+        ]
+        combined_whitelist = list(whitelist) + system_protected
+        self.whitelist = [Path(p).expanduser().resolve() for p in combined_whitelist]
         self.follow_symlinks = follow_symlinks
         self.parallel_workers = parallel_workers
         
@@ -137,9 +143,28 @@ class FilesystemScanner:
             for entry in os.scandir(root_path):
                 path = Path(entry.path)
                 
-                # Skip symbolic links if not following
-                if entry.is_symlink() and not self.follow_symlinks:
-                    continue
+                # Symlink security validation
+                if entry.is_symlink():
+                    if not self.follow_symlinks:
+                        continue
+                    else:
+                        # Validate symlink target is safe
+                        try:
+                            target = path.readlink()
+                            resolved_target = path.resolve()
+                            
+                            # Block symlinks pointing outside user home
+                            home_path = Path.home().resolve()
+                            if not resolved_target.is_relative_to(home_path):
+                                continue
+                                
+                            # Block circular symlinks and traversal attempts
+                            if ".." in str(target) or resolved_target == path.parent:
+                                continue
+                                
+                        except (OSError, RuntimeError):
+                            # Skip problematic symlinks
+                            continue
                     
                 # Check for pattern match
                 match = self._matches_pattern(path)

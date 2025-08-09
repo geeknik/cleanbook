@@ -53,3 +53,20 @@ cleanbook.log
 
 # Application specific
 scan_report_*.json 
+
+# Security Analysis (DO NOT COMMIT)
+# These files contain sensitive security testing tools and vulnerability reports
+fuzzing_analysis.py
+targeted_fuzzing.py
+security_exploits.py
+security_test_suite.py
+SECURITY_ASSESSMENT_REPORT.md
+security_test_report.json
+cleanbook_security_report.json
+*_exploit_*
+*_vulnerability_*
+*_fuzzing_*
+*_security_*
+
+# Other
+CLAUDE.md
